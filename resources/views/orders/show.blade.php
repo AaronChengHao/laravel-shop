@@ -197,6 +197,110 @@
       });
     });
 
+    // 不同意按钮的点击事件
+    $('#btn-refund-disagree').click(function(event) {
+        /* Act on the event */
+        swal({
+            title:'输入拒绝退款理由',
+            input:'text',
+            showCancelButton:true,
+            confirmButtonText:'确认',
+            cancelButtonText:'取消',
+            showLoaderOnConfirm:true,
+            preConfirm: function( inputValue ){
+                if (!inputValue) {
+                    swal('理由不能为空','','error');
+                    return false;
+                }
+
+                // laravel-admin 没有 axios,使用 jQuery 的 ajax 方法来请求
+                return $.$.ajax({
+                    url: '{{ route('admin.orders.handle_refund',[ $order->id ]) }}',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        agree: false, // 拒绝申请
+                        reason: inputValue,
+                        // 带上 CSRF token
+                        // laravel-admin 页面里可以i通过 LA.token 获得 CSRF token
+                        _token:LA.token
+                    }),
+                    contentType:'application/json',     // 请求的数据格式为 JSON
+                },
+                    allowOutsideClick: () => !swal.isLoading()
+                ).then(function( ret ){
+                    // 如果用户点击了 取消按钮，则不做任何操作
+                    if (ret.dismiss == 'cancel') {
+                        return;
+                    }
+
+                    swal({
+                        title：'操作成功',
+                        type:'success'
+                    }).then(function(){
+                        // 用户点击 swal 上的按钮时刷新页面
+                        location.reload();
+                    })
+                })
+            }
+        });
+    });
+
+
+// 『同意』按钮的点击事件
+  $('#btn-refund-agree').click(function() {
+    swal({
+      title: '确认要将款项退还给用户？',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      showLoaderOnConfirm: true,
+      preConfirm: function() {
+        return $.ajax({
+          url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
+          type: 'POST',
+          data: JSON.stringify({
+            agree: true, // 代表同意退款
+            _token: LA.token,
+          }),
+          contentType: 'application/json',
+        });
+      }
+    }).then(function (ret) {
+      // 如果用户点击了『取消』按钮，则不做任何操作
+      if (ret.dismiss === 'cancel') {
+        return;
+      }
+      swal({
+        title: '操作成功',
+        type: 'success'
+      }).then(function() {
+        // 用户点击 swal 上的按钮时刷新页面
+        location.reload();
+      });
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   });
 </script>
 @endsection
