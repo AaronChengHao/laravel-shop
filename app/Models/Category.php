@@ -39,7 +39,7 @@ class Category extends Model
 
     public function parent()
     {
-        return $this->belongtsTo(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function children()
