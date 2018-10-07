@@ -14,6 +14,7 @@ use App\Http\Requests\ApplyRefundRequest;
 use App\Exceptions\CouponCodeUnavailableException;
 use App\Models\CouponCode;
 use Carbon\Carbon;
+use App\Http\Requests\CrowdFundingOrderRequest;
 
 class OrdersController extends Controller
 {
@@ -135,4 +136,19 @@ class OrdersController extends Controller
 
         return $order;
     }
+
+
+    public function crowdfunding(CrowdFundingOrderRequest $request, OrderService $orderService)
+    {
+        $user = $request->user();
+        $sku = \App\Models\ProductSku::find($request->input('sku_id'));
+        $address = \App\Models\UserAddress::find($request->input('address_id'));
+        $amount = $request->input('amount');
+
+        return $orderService->crowdfunding($user,$address,$sku,$amount);
+
+    }
+
+
+
 }
