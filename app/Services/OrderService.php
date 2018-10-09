@@ -33,6 +33,7 @@ class OrderService
                 ],
                 'remark'       => $remark,
                 'total_amount' => 0,
+                'type' => \App\Models\Order::TYPE_NORMAL
             ]);
             // 订单关联到当前用户
             $order->user()->associate($user);
@@ -70,7 +71,6 @@ class OrderService
             }
             // 更新订单总金额
             $order->update(['total_amount' => $totalAmount]);
-            
             // 将下单的商品从购物车中移除
             $skuIds = collect($items)->pluck('sku_id')->all();
             app(CartService::class)->remove($skuIds);
@@ -100,7 +100,8 @@ class OrderService
                     'contact_phone' => $address->contact_phone
                 ],
                 'remark' => '',
-                'total_amount' => $sku->price * $amount
+                'total_amount' => $sku->price * $amount,
+                'type' => \App\Models\Order::TYPE_CROWDFUNDING,
             ]);
             // 订单关联到当前用户
             $order->user()->associate($user);
