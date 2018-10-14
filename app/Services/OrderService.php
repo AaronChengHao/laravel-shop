@@ -79,7 +79,7 @@ class OrderService
         });
 
         // 这里我们直接使用 dispatch 函数
-        dispatch(new CloseOrder($order, config('app.order_ttl')));
+        // dispatch(new CloseOrder($order, config('app.order_ttl')));
 
         return $order;
     }
@@ -129,7 +129,7 @@ class OrderService
         // 众筹结束时间减去当前时间得到剩余秒数
         $crowdfundingTtl = $sku->product->crowdfunding->end_at->getTimestamp() - time();
         // 剩余秒数与默认订单关闭时间取较小值作为订单关闭时间
-        dispatch(new CloseOrder($order, min(config('app.order_ttl'),$crowdfundingTtl)));
+        // dispatch(new CloseOrder($order, min(config('app.order_ttl'),$crowdfundingTtl)));
 
         return $order;
 
@@ -182,6 +182,6 @@ class OrderService
                 throw new InternalException('未知订单支付方式：'.$order->payment_method);
                 break;
         }
-
+    }
 
 }

@@ -44,13 +44,13 @@ class FinishCrowdfunding extends Command
     {
         CrowdfundingProduct::query()
             // 预加载商品数据
-            ->with(['product'])
+            // ->with(['product'])
             // 众筹结束时间早于当前时间
             ->where('end_at','<=',Carbon::now())
             // 众筹状态为众筹中
             ->where('status',CrowdfundingProduct::STATUS_FUNDING)
             ->get()
-            ->each(function( CrowdfundingProduct $corwdfunding ){
+            ->each(function( CrowdfundingProduct $crowdfunding ){
                 // 如果众筹目标金额大于实际众筹金额
                 if ($crowdfunding->target_amount > $crowdfunding->total_amount) {
                     // 调用众筹失败逻辑
