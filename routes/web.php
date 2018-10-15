@@ -36,6 +36,8 @@ Route::group(['middleware' => 'auth'], function() {
     
 
         Route::post('crowdfunding_orders','OrdersController@crowdfunding')->name('crowdfunding_orders.store');
+        Route::post('payment/{order}/installment','PaymentController@payByInstallment')
+            ->name('payment.installment');
     });
 });
 
