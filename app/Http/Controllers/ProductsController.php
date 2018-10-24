@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\InvalidRequestException;
+use App\Services\ProductService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -88,10 +89,7 @@ class ProductsController extends Controller
         $productIds = collect($result['hits']['hits'])->pluck('_id')->all();
         // 通过 whereIn 方法从数据库中读取商品数据
         $products = Product::query()
-            ->whereIn('id', $productIds)
-            // orderByRaw 可以让我们用原生的 SQL 来给查询结果排序
-                ->orderByRaw(sprintf("FIND_IN_SET(id,'%s')",join(',',$productIds)))
-            ->get();
+            ->byIds($productIds)->get();
         // 返回一个 LengthAwarePaginator 对象
 
         $pager = new LengthAwarePaginator($products, $result['hits']['total'], $perPage, $page, [
@@ -110,7 +108,7 @@ class ProductsController extends Controller
         ]);
     }
 
-    public function show(Product $product, Request $request)
+    public function show(Product $product, Request $request, ProductService $service)
     {
         if (!$product->on_sale) {
             throw new InvalidRequestException('商品未上架');
@@ -131,12 +129,19 @@ class ProductsController extends Controller
             ->orderBy('reviewed_at', 'desc') // 按评价时间倒序
             ->limit(10) // 取出 10 条
             ->get();
-        
+
+
+        $similarProductIds = $service->getSimilarProductIds($product,4);
+        $similarProducts = Product::query()->byIds($similarProductIds)->get();
+
+
+
         // 最后别忘了注入到模板中
         return view('products.show', [
             'product' => $product,
             'favored' => $favored,
-            'reviews' => $reviews
+            'reviews' => $reviews,
+            'similar' => $similarProducts
         ]);
     }
 
