@@ -39,6 +39,8 @@ Route::group(['middleware' => 'auth'], function() {
         Route::post('payment/{order}/installment','PaymentController@payByInstallment')
             ->name('payment.installment');
 
+        Route::post('seckill_orders','OrdersController@seckill')->name('seckill_orders.store');
+
         // 分期付款路由
         Route::get('installments','InstallmentsController@index')->name('installments.index');
         Route::get('installments/{installment}','InstallmentsController@show')->name('installments.show');
